@@ -14,6 +14,10 @@ connectDB();
 
 const app = express();
 
+app.get('/', (req, res) => {
+  res.send('API is running successfully!');
+});
+
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(helmet());
