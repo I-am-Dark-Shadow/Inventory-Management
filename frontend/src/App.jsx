@@ -4,9 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
-import AssignedHistory from './pages/AssignedHistory'; // Import This
 import Login from './pages/Login';
-import Register from './pages/Register';
+//import Register from './pages/Register';
 import { useContext } from 'react';
 import AuthContext from './context/AuthContext';
 
@@ -23,12 +22,11 @@ function App() {
         <Toaster position="top-right" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/register" element={<Register />} /> */}
           
           <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/inventory" element={<Inventory />} />
-            <Route path="/assignments" element={<AssignedHistory />} /> {/* Add Route */}
           </Route>
         </Routes>
       </AuthProvider>

@@ -5,8 +5,11 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  // ADD THIS LINE
+  branch: { type: String, required: true, enum: ['Kredent', 'Dalhousie'] } 
 }, { timestamps: true });
 
+// ... baki code same thakbe (pre-save, matchPassword etc.)
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) next();
   const salt = await bcrypt.genSalt(10);

@@ -65,11 +65,11 @@ const AddStockModal = ({ onClose, onAdd, defaultCategory }) => {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            {/* <div>
               <label className="block text-gray-400 text-sm mb-1">Quantity</label>
               <input type="number" className="w-full bg-black border border-gray-700 rounded p-2 text-white" 
                  value={formData.quantity} onChange={e => setFormData({...formData, quantity: parseInt(e.target.value)})} min="1" required/>
-            </div>
+            </div> */}
             <div>
               <label className="block text-gray-400 text-sm mb-1">Date</label>
               <input type="date" className="w-full bg-black border border-gray-700 rounded p-2 text-white"
@@ -79,7 +79,7 @@ const AddStockModal = ({ onClose, onAdd, defaultCategory }) => {
 
           <div>
             <label className="block text-gray-400 text-sm mb-1">Barcode / Serial</label>
-            <input type="text" placeholder="e.g. MON-2023-" className="w-full bg-black border border-gray-700 rounded p-2 text-white"
+            <input type="text" placeholder="####-####" className="w-full bg-black border border-gray-700 rounded p-2 text-white"
                value={formData.barcode} onChange={e => setFormData({...formData, barcode: e.target.value})} required />
           </div>
 

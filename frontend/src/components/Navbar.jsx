@@ -1,41 +1,56 @@
-import { Bell, Moon, UserCircle } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from "react-router-dom";
+import { LayoutDashboard, Boxes, LogOut } from "lucide-react";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 const Navbar = () => {
-  const location = useLocation();
-
-  // Map route to title
-  const getTitle = () => {
-    switch(location.pathname) {
-      case '/': return 'Dashboard';
-      case '/inventory': return 'Stock Inventory';
-      default: return 'Overview';
-    }
-  };
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   return (
-    <div className="flex justify-between items-center mb-8 bg-[#18181B] p-4 rounded-xl border border-gray-800">
-      <h2 className="text-xl font-semibold text-white">{getTitle()}</h2>
+    <nav className="fixed top-0 left-0 w-full z-50 bg-[#0F1115]/90 backdrop-blur-xl border-b border-gray-800">
+      <div className="max-w-7xl mx-6 h-16 flex items-center justify-between">
 
-      <div className="flex items-center gap-4">
-        {/* Top Navigation Links from Design */}
-        <div className="bg-[#0B0C10] border border-gray-700 rounded-lg p-1 flex gap-1 mr-4">
-          <button className={`px-4 py-1.5 rounded text-sm font-medium ${location.pathname === '/' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}>
-            Dashboard
-          </button>
-          <button className={`px-4 py-1.5 rounded text-sm font-medium ${location.pathname === '/inventory' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}>
-            Stock
-          </button>
+        {/* LOGO */}
+        <div
+          onClick={() => navigate("/")}
+          className="text-xl font-bold text-white cursor-pointer tracking-wide"
+        >
+          <img src="./images.png" alt="" className="w-[120px]" />
         </div>
 
-        {/* Action Icons */}
-        <button className="text-gray-400 hover:text-white"><Bell size={20} /></button>
-        <button className="text-gray-400 hover:text-white"><Moon size={20} /></button>
-        <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white font-bold cursor-pointer">
-          <UserCircle size={24} />
+        {/* NAV LINKS */}
+        <div className="flex items-center mx-[-190px] gap-6 text-sm font-semibold">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-4 py-2 rounded-lg transition
+               ${isActive ? "bg-blue-500/20 text-blue-400" : "text-gray-300 hover:bg-white/10"}`
+            }
+          >
+            <LayoutDashboard size={18} /> Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/inventory"
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-4 py-2 rounded-lg transition
+               ${isActive ? "bg-green-500/20 text-green-400" : "text-gray-300 hover:bg-white/10"}`
+            }
+          >
+            <Boxes size={18} /> Inventory
+          </NavLink>
+
+          {/* LOGOUT */}
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-red-400 bg-red-500/10 hover:bg-red-100 transition"
+          >
+            <LogOut size={18} /> Logout
+          </button>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 

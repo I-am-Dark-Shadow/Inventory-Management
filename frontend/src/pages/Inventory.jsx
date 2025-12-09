@@ -16,7 +16,7 @@ const Inventory = () => {
   // Search & Pagination State
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 6;
 
   // Modal States
   const [isAddModalOpen, setAddModalOpen] = useState(false);
@@ -74,14 +74,31 @@ const Inventory = () => {
     }
   };
 
-  const handleAssignStock = async (formData) => {
-      try {
-        await axios.post('/products/assign', formData);
-        toast.success('Assigned');
-        setAssignTarget(null);
-        fetchData();
-      } catch (e) { toast.error('Error assigning'); }
-  };
+  const formatDate = (dateString) => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+
+  const day = date.getDate().toString().padStart(2, "0");
+
+  const monthNames = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+  ];
+
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
+  // const handleAssignStock = async (formData) => {
+  //     try {
+  //       await axios.post('/products/assign', formData);
+  //       toast.success('Assigned');
+  //       setAssignTarget(null);
+  //       fetchData();
+  //     } catch (e) { toast.error('Error assigning'); }
+  // };
 
   const handleAddStock = async (formData) => {
       try {
@@ -97,13 +114,20 @@ const Inventory = () => {
       {/* --- STOCK SECTION --- */}
       <div>
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <h2 className="text-xl font-bold text-white">
-              {categoryParam ? `${categoryParam} Stock` : 'All Stock Inventory'}
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                {categoryParam ? `${categoryParam} Stock` : 'All Stocks'}
+
+                <span className="bg-blue-500/10 text-blue-400 px-3 py-2 rounded-lg text-sm font-semibold">
+                    {filteredProducts.length}
+                </span>
+                {/* <span className="text-sm text-gray-400">
+                    Showing {filteredProducts.length} items
+                  </span> */}
             </h2>
             
             <div className="flex gap-3 w-full md:w-auto">
                <div className="relative flex-1 md:w-64">
-                  <Search className="absolute left-3 top-2.5 text-gray-500" size={18} />
+                  <Search className="absolute left-3 top-3 text-gray-500" size={18} />
                   <input 
                     type="text" 
                     placeholder="Search name, category, barcode..." 
@@ -112,7 +136,7 @@ const Inventory = () => {
                     onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                   />
                </div>
-               <button onClick={() => setAddModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm font-semibold flex items-center gap-2">
+               <button onClick={() => setAddModalOpen(true)} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm font-semibold flex items-center gap-1 uppercase">
                   <Plus size={16} /> Add
                </button>
             </div>
@@ -125,8 +149,9 @@ const Inventory = () => {
                 <th className="px-6 py-4">Barcode</th>
                 <th className="px-6 py-4">Product Name</th>
                 <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Status / Qty</th> 
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4">Status</th> 
+                <th className="px-6 py-4">Date</th> 
+                <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -147,13 +172,16 @@ const Inventory = () => {
                          </span>
                        )}
                     </td>
+                    <td className="px-4 py-3 text-gray-300 uppercase font-mono">
+                        {formatDate(p.createdAt)}
+                    </td>
                     <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      <button onClick={() => setAssignTarget(p)} disabled={p.quantity < 1} className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/20 disabled:opacity-30">Assign</button>
+                      {/* <button onClick={() => setAssignTarget(p)} disabled={p.quantity < 1} className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/20 disabled:opacity-30">Assign</button> */}
                       
                       {/* DELETE BUTTON: Opens Modal now */}
                       <button 
                         onClick={() => setDeleteTarget(p)} 
-                        className="bg-red-500/10 text-red-400 px-3 py-1 rounded hover:bg-red-500/20"
+                        className="bg-red-500/10 text-red-400 px-3 py-2 rounded hover:bg-red-500/20 flex"
                       >
                         <Trash2 size={14}/>
                       </button>

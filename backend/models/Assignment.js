@@ -5,6 +5,7 @@ const assignmentSchema = new mongoose.Schema({
   employeeName: { type: String, required: true },
   department: { type: String, required: true },
   quantityAssigned: { type: Number, required: true },
+  branch: { type: String, required: true }, // <--- ADD THIS
   assignedDate: { type: Date, default: Date.now },
 }, { timestamps: true });
 

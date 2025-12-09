@@ -16,16 +16,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    const { data } = await axios.post('/auth/login', { email, password });
+  const login = async (email, password, branch) => {
+    // Send branch to backend
+    const { data } = await axios.post('/auth/login', { email, password, branch });
     localStorage.setItem('token', data.token);
     localStorage.setItem('userInfo', JSON.stringify(data));
     setUser(data);
     return data;
   };
 
-  const register = async (name, email, password) => {
-    const { data } = await axios.post('/auth/register', { name, email, password });
+  const register = async (name, email, password, branch) => {
+    const { data } = await axios.post('/auth/register', { name, email, password, branch });
     localStorage.setItem('token', data.token);
     localStorage.setItem('userInfo', JSON.stringify(data));
     setUser(data);

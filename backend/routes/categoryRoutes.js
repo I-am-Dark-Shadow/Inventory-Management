@@ -5,25 +5,19 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// @desc    Get all categories
-// @route   GET /api/categories
 router.get('/', protect, asyncHandler(async (req, res) => {
-  const categories = await Category.find({}).sort({ name: 1 });
+  // Only show categories for the user's branch
+  const categories = await Category.find({ branch: req.user.branch }).sort({ name: 1 });
   res.json(categories);
 }));
 
-// @desc    Add new category
-// @route   POST /api/categories
 router.post('/', protect, asyncHandler(async (req, res) => {
   const { name } = req.body;
   
-  const categoryExists = await Category.findOne({ name });
-  if (categoryExists) {
-    res.status(400);
-    throw new Error('Category already exists');
-  }
+  const categoryExists = await Category.findOne({ name, branch: req.user.branch });
+  if (categoryExists) { res.status(400); throw new Error('Category already exists'); }
 
-  const category = await Category.create({ name });
+  const category = await Category.create({ name, branch: req.user.branch });
   res.status(201).json(category);
 }));
 
