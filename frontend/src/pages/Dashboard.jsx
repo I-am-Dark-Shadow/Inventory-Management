@@ -166,7 +166,9 @@ const Dashboard = () => {
       {/* CATEGORY CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {filteredStats.map((stat) => {
-          const critical = stat.available <= stat.reserve;
+          
+          //  ✅ NEW LOW STOCK RULE
+          const critical = stat.available <= 5;
 
           return (
             <div
@@ -194,10 +196,6 @@ const Dashboard = () => {
                     {stat.name}
                   </h3>
                 </div>
-
-                {/* <span className="text-xs font-bold bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full">
-                  Reserve {stat.reserve}
-                </span> */}
               </div>
 
               {/* Stats */}

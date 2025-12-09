@@ -37,7 +37,7 @@ const AddCategoryModal = ({ onClose, onCategoryAdded }) => {
             <input 
               type="text" 
               className="w-full bg-black border border-gray-700 rounded p-2 text-white focus:border-blue-500 outline-none" 
-              placeholder="e.g. Printer, Scanner"
+              placeholder="Printer, Scanner, etc."
               value={name} 
               onChange={e => setName(e.target.value)} 
               required 
