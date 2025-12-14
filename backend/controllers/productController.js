@@ -22,22 +22,28 @@ export const getProducts = asyncHandler(async (req, res) => {
 
 // Create Product (Auto-assign Branch)
 export const createProduct = asyncHandler(async (req, res) => {
-  const { name, category, quantity, barcode } = req.body;
+  // 1. 'date' ta req.body theke nin
+  const { name, category, quantity, barcode, date } = req.body; 
   
-  // Check if barcode exists IN THIS BRANCH
   const productExists = await Product.findOne({ barcode, branch: req.user.branch });
 
   if (productExists) {
-    res.status(400); throw new Error('Product with this barcode already exists in this branch');
+    res.status(400);
+    throw new Error('Product with this barcode already exists in this branch');
   }
 
   const product = await Product.create({
-    name, category, quantity, barcode,
-    branch: req.user.branch // <--- Save Branch
+    name,
+    category,
+    quantity,
+    barcode,
+    // 2. Ekhane manual date ta save korun (jodi na thake tobe current date)
+    date: date || Date.now(), 
+    branch: req.user.branch
   });
+  
   res.status(201).json(product);
 });
-
 // Assign Product
 export const assignProduct = asyncHandler(async (req, res) => {
   const { productId, employeeName, department, quantity } = req.body;

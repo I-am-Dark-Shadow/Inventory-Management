@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
-import { Plus, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Search, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Imports
 import AddStockModal from '../components/Modals/AddStockModal';
 import AssignStockModal from '../components/Modals/AssignStockModal';
-import DeleteConfirmModal from '../components/Modals/DeleteConfirmModal'; // <-- IMPORT THIS
+import DeleteConfirmModal from '../components/Modals/DeleteConfirmModal';
 
 const Inventory = () => {
   const [products, setProducts] = useState([]);
@@ -23,7 +23,7 @@ const Inventory = () => {
   const [assignTarget, setAssignTarget] = useState(null);
   
   // Delete Modal State
-  const [deleteTarget, setDeleteTarget] = useState(null); // <-- NEW STATE
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   // URL Params for Category Filter
   const [searchParams] = useSearchParams();
@@ -60,7 +60,7 @@ const Inventory = () => {
     currentPage * itemsPerPage
   );
 
-  // --- NEW DELETE LOGIC ---
+  // --- DELETE LOGIC ---
   const confirmDelete = async () => {
     if (!deleteTarget) return;
 
@@ -74,36 +74,32 @@ const Inventory = () => {
     }
   };
 
+  // --- DATE FORMATTER ---
   const formatDate = (dateString) => {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, "0");
+    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
-  const day = date.getDate().toString().padStart(2, "0");
+  // --- ASSIGN LOGIC ---
+  const handleAssignStock = async (formData) => {
+       try {
+         await axios.post('/products/assign', formData);
+         toast.success('Assigned Successfully');
+         setAssignTarget(null);
+         fetchData();
+       } catch (e) { toast.error('Error assigning'); }
+  };
 
-  const monthNames = [
-    "Jan","Feb","Mar","Apr","May","Jun",
-    "Jul","Aug","Sep","Oct","Nov","Dec"
-  ];
-
-  const month = monthNames[date.getMonth()];
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
-};
-
-  // const handleAssignStock = async (formData) => {
-  //     try {
-  //       await axios.post('/products/assign', formData);
-  //       toast.success('Assigned');
-  //       setAssignTarget(null);
-  //       fetchData();
-  //     } catch (e) { toast.error('Error assigning'); }
-  // };
-
+  // --- ADD STOCK LOGIC ---
   const handleAddStock = async (formData) => {
       try {
           await axios.post('/products', formData);
-          toast.success('Added');
+          toast.success('Added Successfully');
           setAddModalOpen(false);
           fetchData();
       } catch(e) { toast.error('Error adding'); }
@@ -111,7 +107,7 @@ const Inventory = () => {
 
   return (
     <div className="space-y-8">
-      {/* --- STOCK SECTION --- */}
+      {/* --- HEADER SECTION --- */}
       <div>
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-3">
@@ -120,9 +116,6 @@ const Inventory = () => {
                 <span className="bg-blue-500/10 text-blue-400 px-3 py-2 rounded-lg text-sm font-semibold">
                     {filteredProducts.length}
                 </span>
-                {/* <span className="text-sm text-gray-400">
-                    Showing {filteredProducts.length} items
-                  </span> */}
             </h2>
             
             <div className="flex gap-3 w-full md:w-auto">
@@ -142,9 +135,10 @@ const Inventory = () => {
             </div>
         </div>
         
+        {/* --- TABLE SECTION --- */}
         <div className="bg-[#18181B] rounded-lg border border-gray-800 overflow-hidden">
           <table className="w-full text-left text-sm text-gray-400">
-            <thead className="bg-[#0F1115] text-blue-500  text-lg uppercase font-medium text-center">
+            <thead className="bg-[#0F1115] text-blue-500 text-sm uppercase font-medium text-center">
               <tr>
                 <th className="px-6 py-4">Barcode</th>
                 <th className="px-6 py-4">Product Name</th>
@@ -157,14 +151,14 @@ const Inventory = () => {
             <tbody className="divide-y divide-gray-800">
               {paginatedProducts.length > 0 ? (
                 paginatedProducts.map((p) => (
-                  <tr key={p._id} className="hover:bg-gray-800/50 text-center">
+                  <tr key={p._id} className="hover:bg-gray-800/50 text-center transition-colors">
                     <td className="px-6 py-4 font-mono text-white">{p.barcode}</td>
                     <td className="px-6 py-4 text-white font-medium">{p.name?.toUpperCase()}</td>
                     <td className="px-6 py-4"><span className="bg-gray-800 px-2 py-1 rounded text-xs">{p.category}</span></td>
                     <td className="px-6 py-4">
                        {p.quantity > 0 ? (
                          <span className="text-green-400 font-bold bg-green-500/10 px-3 py-1 rounded-full text-xs">
-                           IN STOCK
+                           IN STOCK: {p.quantity}
                          </span>
                        ) : (
                          <span className="text-red-400 font-bold bg-red-500/10 px-3 py-1 rounded-full text-xs">
@@ -172,26 +166,37 @@ const Inventory = () => {
                          </span>
                        )}
                     </td>
+                    
+                    {/* DISPLAY MANUAL DATE HERE */}
                     <td className="px-4 py-3 text-gray-300 uppercase font-mono">
-                        {formatDate(p.createdAt)}
+                        {formatDate(p.date)}
                     </td>
+
                     <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      {/* <button onClick={() => setAssignTarget(p)} disabled={p.quantity < 1} className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/20 disabled:opacity-30">Assign</button> */}
+                      {/* ASSIGN BUTTON */}
+                      <button 
+                        onClick={() => setAssignTarget(p)} 
+                        disabled={p.quantity < 1} 
+                        className="bg-blue-500/10 text-blue-400 px-3 py-2 rounded hover:bg-blue-500/20 disabled:opacity-30 flex items-center"
+                        title="Assign to Employee"
+                      >
+                        <UserPlus size={14} />
+                      </button>
                       
-                      {/* DELETE BUTTON: Opens Modal now */}
+                      {/* DELETE BUTTON */}
                       <button 
                         onClick={() => setDeleteTarget(p)} 
-                        className="bg-red-500/10 text-red-400 px-3 py-2 rounded hover:bg-red-500/20 flex"
+                        className="bg-red-500/10 text-red-400 px-3 py-2 rounded hover:bg-red-500/20 flex items-center"
+                        title="Move to Scrap"
                       >
                         <Trash2 size={14}/>
                       </button>
-
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-12 text-gray-500 text-lg">
+                  <td colSpan="6" className="text-center py-12 text-gray-500 text-lg">
                      Item Not Found
                   </td>
                 </tr>
