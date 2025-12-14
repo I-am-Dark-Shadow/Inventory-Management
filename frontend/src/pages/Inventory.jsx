@@ -187,7 +187,7 @@ const Inventory = () => {
                       </td>
 
                       <td className="px-6 py-4 text-right whespace-nowrap">
-                        <div className="flex justify-center">
+                        <div className="flex justify-end items-center">
                             {/* <button 
                                 onClick={() => setAssignTarget(p)} 
                                 disabled={p.quantity < 1} 
